@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graphique de réponse fréquentielle</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="myChart" width="400" height="400"></canvas>
+    <script>
+        // Calcul des valeurs de gain Av(dB) pour différentes fréquences
+        function calculateGain(frequencies, fh, Av) {
+            return frequencies.map(function(f) {
+                return 20 * Math.log10(Av) - 20 * Math.log10(1 + (f / (2 * Math.PI * fh)));
+            });
+        }
+
+        // Paramètres
+        const fh = 0.075; // Fréquence haute en kHz
+        const fMin = 0.1; // Fréquence min en Hz
+        const fMax = 30000000 ; // Fréquence max en MHz (modifier si nécessaire)
+        const Av = 200000; // Gain Av
+
+        // Génération des fréquences
+        const frequencies = [];
+        for (let f = fMin; f <= fMax  ; f *= 10) { // Conversion MHz en Hz
+            frequencies.push(f);
+        }
+
+        // Calcul des gains correspondants
+        const gains = calculateGain(frequencies, fh, Av);
+
+        // Configuration du graphique
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: frequencies,
+                datasets: [{
+                    label: '|H(p)|(dB)',
+                    data: gains,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'logarithmic',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            //text: 'Fréquence (Hz)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            //text: 'Gain (dB)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
